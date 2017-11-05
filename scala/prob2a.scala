@@ -114,7 +114,7 @@ def cell_neighbor_rel_score(cellId: Int, cellScoreMap: Map[Int, Float]): String 
   return res
 }
 
-val tf = sc.textFile("/home/mqp/CS585-Project3/jars/datasets/points.txt")
+val tf = sc.textFile("hdfs://localhost:8020/user/kavin/spark/points.txt")
 val cellCount = tf.map(line => pointLine2CellId(line)).map(cellId => (cellId, 1)).reduceByKey(_+_)
 
 //cellCount.foreach(println)
