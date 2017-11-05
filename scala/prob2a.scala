@@ -31,7 +31,7 @@ def neighbors(cellId: Int): ListBuffer[Int] = {
        if (neighbor_co(i) < 0 || neighbor_co(i) > 10000) {
          valid_cell = false
          break;
-}
+       }
        if (math.abs(neighbor_co(i)-coors(i)) > 40) {
          valid_cell = false
          break;
@@ -106,23 +106,23 @@ val cellCount = tf.map(line => pointLine2CellId(line)).map(cellId => (cellId, 1)
 
 //////////////////////////// 2B ///////////////////////////
 //convert to map
-val map: Map[Int, Int] = cellCount.collect.toMap
-val cellScore = cellCount.map{case (k, v) => (k, cell_rel_score(k, v, map))}
+//val map: Map[Int, Int] = cellCount.collect.toMap
+//val cellScore = cellCount.map{case (k, v) => (k, cell_rel_score(k, v, map))}
 //select top k=100
-val cellScoreDF = cellScore.toDF("cellId", "score")
-cellScoreDF.orderBy($"score".desc).limit(100).show()
-val cellScoreDFtop100 = cellScoreDF.orderBy($"score".desc).limit(100)
-cellScoreDFtop100.write.format("com.databricks.spark.csv").save("problem2-B.top100")
-cellScoreDFtop100.show()
+//val cellScoreDF = cellScore.toDF("cellId", "score")
+//cellScoreDF.orderBy($"score".desc).limit(100).show()
+//val cellScoreDFtop100 = cellScoreDF.orderBy($"score".desc).limit(100)
+//cellScoreDFtop100.write.format("com.databricks.spark.csv").save("problem2-B.top100")
+//cellScoreDFtop100.show()
 
 ////////////////////// 2C ///////////////////////////////// 
 //convert cellScore to Map:
-val cellScoreMap: Map[Int, Float] = cellScore.collect.toMap
-val cellScoreNeighbor = cellScore.map{case (k,v) => (k,cell_neighbor_rel_score(k, cellScoreMap)) }
-val cellScoreNeighborDF = cellScoreNeighbor.toDF("cellId", "score")
-val cellScoreDFtop100 = cellScoreNeighborDF.orderBy($"score".desc).limit(100)
-cellScoreDFtop100.write.format("com.databricks.spark.csv").save("problem2-C.top100")
-cellScoreDFtop100.show()
+//val cellScoreMap: Map[Int, Float] = cellScore.collect.toMap
+//val cellScoreNeighbor = cellScore.map{case (k,v) => (k,cell_neighbor_rel_score(k, cellScoreMap)) }
+//val cellScoreNeighborDF = cellScoreNeighbor.toDF("cellId", "score")
+//val cellScoreDFtop100 = cellScoreNeighborDF.orderBy($"score".desc).limit(100)
+//cellScoreDFtop100.write.format("com.databricks.spark.csv").save("problem2-C.top100")
+//cellScoreDFtop100.show()
 
 
 
