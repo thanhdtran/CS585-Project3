@@ -85,22 +85,7 @@ def cell_rel_score(cellId: Int, count: Int, map: Map[Int, Int]): Float = {
  }
 }
 
-def cell_rel_score(cellId: Int, count: Int, map: Map[Int, Int]): Float = {
- val neighborCells = neighbors(cellId)
- var totalCount: Int = 0
- var num_neighbors = neighborCells.size
- for (neighborCellId <- neighborCells) {
-   totalCount = totalCount + map.getOrElse(neighborCellId, 0)
- }
-
- if (totalCount <= 0) return 0
- else{
-     val neighbors_avg_count: Float = totalCount.toFloat/num_neighbors.toFloat
-     return count.toFloat/neighbors_avg_count
- }
-}
-
-def cell_neighbor_rel_score(cellId: Int, cellScoreMap: Map[Int, Float]): String = {
+def cell_neighbor_rel_score(cellId: Int, cellScoreMap: Map[Int, Float]): (Float,String) = {
   val neighborCells = neighbors(cellId)
   var res: String = ""
   for (neighborCellId <- neighborCells) {
@@ -111,7 +96,7 @@ def cell_neighbor_rel_score(cellId: Int, cellScoreMap: Map[Int, Float]): String 
        res += "," + neighborCellId.toString + ":" + neighbor_rel_score.toString 
      }
   }
-  return res
+  return (cellScoreMap.getOrElse(cellId, 0), res)
 }
 
 val tf = sc.textFile("/home/mqp/CS585-Project3/jars/datasets/points.txt")
@@ -140,4 +125,22 @@ val cellScoreNeighborDF = cellScoreNeighbor.toDF("cellId", "score")
 val cellScoreDFtop100 = cellScoreNeighborDF.orderBy($"score".desc).limit(100)
 cellScoreDFtop100.write.format("com.databricks.spark.csv").save("problem2-C.top100")
 cellScoreDFtop100.show()
+
+
+
+/////////2B/
+//convert to map
+val map: Map[Int, Int] = cellCount.collect.toMap
+val cellScore = cellCount.map{case (k, v) => (k, cell_rel_score(k, v, map))}
+//select top k=100
+val cellScoreSorted = cellScore.takeOrdered(100)(Ordering[Float].reverse.on(_._2))
+cellScoreSorted.foreach(println)
+
+////////2C
+val cellScoreMap: Map[Int, Float] = cellScore.collect.toMap
+val cellScoreNeighbor = cellScore.map{case (k,v) => (k,cell_neighbor_rel_score(k, cellScoreMap)) }
+val cellScoreNeighborTopK = cellScoreNeighbor.takeOrdered(100)(Ordering[Float].reverse.on(_._2._1))
+for (i <- 0 to (cellScoreNeighborTopK.size - 1)) {
+  println(cellScoreNeighborTopK(i)._1 + "," + cellScoreNeighborTopK(i)._2._2)
+}
 
