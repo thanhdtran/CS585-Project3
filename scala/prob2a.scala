@@ -18,9 +18,6 @@ def neighbors(cellId: Int): ListBuffer[Int] = {
  var neighbors = new ListBuffer[Int]()
  if (cellId > 250000 || cellId < 1) return neighbors
  val coors: Array[Int] = coordinate(cellId)
- val same_y_cells: Array[Int] = Array(cellId - 1, cellId + 1)
- val less_y_cells: Array[Int] = Array(cellId - 500 - 1, cellId - 500, cellId - 500 + 1)
- val greater_y_cells: Array[Int] = Array(cellId + 500 - 1, cellId + 500, cellId + 500 + 1)
  val possible_neighbor_cells: Array[Int] = Array(cellId - 500 - 1, cellId - 500, cellId - 500 + 1,
    cellId - 1, cellId + 1,
    cellId + 500 - 1, cellId + 500, cellId + 500 + 1
