@@ -85,19 +85,7 @@ def cell_rel_score(cellId: Int, count: Int, map: Map[Int, Int]): Float = {
  }
 }
 
-def convert_to_map(k: Int, v: Int, map: Map[Int, Int]): Unit = {
-    var map : Map[Int, Int] = Map[Int, Int]()
-    map(k) = v
-}
-def convert_to_map(cellCount: RDD[Int, Int]): Map[Int, Int] = {
-    var map: Map[Int, Int] = Map[Int, Int]()
-    for (x <- cellCount.keys) {
-          map += (x  -> cellCount.lookup(x) (0))
-    }
-    return map
-}
-
-def cell_rel_score(cellId: Int, count: Int, map: IndexedRDD[Int, Int]): Float = {
+def cell_rel_score(cellId: Int, count: Int, map: Map[Int, Int]): Float = {
  val neighborCells = neighbors(cellId)
  var totalCount: Int = 0
  var num_neighbors = neighborCells.size
@@ -131,16 +119,11 @@ val cellCount = tf.map(line => pointLine2CellId(line)).map(cellId => (cellId, 1)
 
 //cellCount.foreach(println)
 
-cellCount.saveAsTextFile("out")
+//cellCount.saveAsTextFile("out")
 
+//////////////////////////// 2B ///////////////////////////
 //convert to map
 val map: Map[Int, Int] = cellCount.collect.toMap
-//import edu.berkeley.cs.amplab.spark.indexedrdd.IndexedRDD
-//import edu.berkeley.cs.amplab.spark.indexedrdd.IndexedRDD._
-
-//import org.apache.spark.rdd.IndexedRDD
-//val map = sc.broadcast(IndexedRDD(cellCount))
-//val map = cellCount.map(x => convert_to_map(x._1, x._2))
 val cellScore = cellCount.map{case (k, v) => (k, cell_rel_score(k, v, map))}
 //select top k=100
 val cellScoreDF = cellScore.toDF("cellId", "score")
@@ -148,9 +131,9 @@ cellScoreDF.orderBy($"score".desc).limit(100).show()
 val cellScoreDFtop100 = cellScoreDF.orderBy($"score".desc).limit(100)
 cellScoreDFtop100.write.format("com.databricks.spark.csv").save("problem2-B.top100")
 cellScoreDFtop100.show()
-//2-c: 
+
+////////////////////// 2C ///////////////////////////////// 
 //convert cellScore to Map:
-// val idexedRDD = IndexeRDD(cellCount)
 val cellScoreMap: Map[Int, Float] = cellScore.collect.toMap
 val cellScoreNeighbor = cellScore.map{case (k,v) => (k,cell_neighbor_rel_score(k, cellScoreMap)) }
 val cellScoreNeighborDF = cellScoreNeighbor.toDF("cellId", "score")
