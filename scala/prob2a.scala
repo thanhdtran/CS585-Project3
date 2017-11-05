@@ -1,3 +1,4 @@
+import org.apache.spark.rdd.RDD
 import scala.collection.immutable.Stream.Empty
 import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks._
@@ -65,7 +66,7 @@ def pointLine2CellId(line: String) : Int = {
 }
 
 
-import org.apache.spark.rdd.RDD
+
 //calculating the relative density score of a cellId
 def cell_rel_score(cellId: Int, count: Int, map: Map[Int, Int]): Float = {
  val neighborCells = neighbors(cellId)
