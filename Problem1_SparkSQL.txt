@@ -1,0 +1,37 @@
+spark-shell --packages com.databricks:spark-csv_2.11:1.5.0
+
+val hdfs_path="hdfs://localhost:8020/user/kavin/spark/"
+
+val sqlContext=new org.apache.spark.sql.SQLContext(sc)
+
+sqlContext.sql("CREATE TABLE customers(cust_id int,cust_name string,cust_age int,cust_country_code int, cust_salary float) USING com.databricks.spark.csv OPTIONS (path hdfs_path+'customer', header 'false', inferSchema 'true')")
+
+val cust=sqlContext.sql("SELECT * from customers")
+
+cust.show()
+
+
+sqlContext.sql("CREATE TABLE transactions(trans_id int, cust_id int,trans_total float,num_items int, trans_desc string) USING com.databricks.spark.csv OPTIONS (path hdfs_path+'transactions', header 'false', inferSchema 'true')")
+
+val trans=sqlContext.sql("SELECT * from transactions")
+
+trans.show()
+
+val t1=trans.filter(trans("trans_total")>200)
+
+val t2=t1.groupBy("num_items").agg(sum("trans_total"), min("trans_total"), max("trans_total"), mean("trans_total"))
+
+t2.show()
+
+val t3=t1.groupBy("cust_id").agg(count("trans_id") as "t3_trans_count")
+
+val t4=trans.filter(trans("trans_total")>600)
+
+val t5=t4.groupBy("cust_id").agg(count("trans_id") as "t5_trans_count")
+
+val t5_join_t3=t5.join(t3, ("cust_id"))
+
+val t6=t5_join_t3.filter(t5_join_t3("t5_trans_count")*3<t5_join_t3("t3_trans_count"))
+
+t6.show()
+
