@@ -106,7 +106,6 @@ val cellCount = tf.map(line => pointLine2CellId(line)).map(cellId => (cellId, 1)
 //cellCount.foreach(println)
 
 //cellCount.saveAsTextFile("out")
-
 //////////////////////////// 2B ///////////////////////////
 //convert to map
 //val map: Map[Int, Int] = cellCount.collect.toMap
