@@ -97,7 +97,10 @@ def cell_neighbor_rel_score(cellId: Int, cellScoreMap: Map[Int, Float]): (Float,
   return (cellScoreMap.getOrElse(cellId, 0), res)
 }
 
-val tf = sc.textFile("/home/mqp/CS585-Project3/jars/datasets/points.txt")
+//load local file, uncomment this:
+//val tf = sc.textFile("/home/mqp/CS585-Project3/jars/datasets/points.txt") 
+//load hdfs file, using this, change the path if neccessary
+val tf = sc.textFile("hdfs:localhost:8020/user/project3/input/points.txt")
 val cellCount = tf.map(line => pointLine2CellId(line)).map(cellId => (cellId, 1)).reduceByKey(_+_)
 
 //cellCount.foreach(println)
